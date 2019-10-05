@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Revolut Event Streaming</title>
+
+	<meta name="description" content="Revolut Event Streaming Presentation">
+	<meta name="author" content="Jacek Spolnik">
+
+	<link rel="shortcut icon" href="img/icon-48x48.png">
+
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/black.css">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/monokai.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName('head')[0].appendChild(link);
+	</script>
+	<style>
+		body {
+			background-image: url(img/logo_small.png);
+			background-size: 2%;
+			background-repeat: no-repeat;
+			background-position: 2% 97%;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<img data-src="img/logo.png" style="background:none; border:none; box-shadow:none;" height="150">
+				<h2>Event Streaming</h2>
+			</section>
+			<section>
+				<img data-src="img/geecon.jpg" style="background:white; border-radius: 5px; box-shadow:none; padding: 10px 20px" height="150">
+				<p>Join at</p>
+				<h3>slido.com</h3>
+				<p>#geecon2019 / <span style="color: #efef8f">Room 11</span></p>
+			</section>
+			<section>
+				<h2>Jacek Spólnik</h2>
+				<pre><code data-trim data-noescape >
+					Company.now("Revolut", 1.year)
+						.past("UBS", 3.years)
+						.past("EPAM", 4.years)
+						.past("Apriso", 3.years)
+
+					TechStack.now("Java", 7.years).past("C#", 4.years)
+
+					OpenSource.now("JAlgoArena").past("TradingOffice")
+						.past("NDatabase")
+
+					FavouriteStack.now("GoLang").past("Kotlin")
+						.past("JavaScript")
+				 </code></pre>
+			</section>
+			<section>
+				<section>
+					<h2>Context</h2>
+				</section>
+				<section>
+					<h3>Money</h3>
+					<ul>
+						<li>Highly regulated</li>
+						<li>Correctness of domain</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Rapid Growth</h3>
+					<ul>
+						<li>Huge amount of data</li>
+						<li>Huge traffic, spikes</li>
+						<li>Need for horizontal scalability</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Why</h2>
+				</section>
+				<section>
+					Business events audit and distribution.
+					<ul>
+						<li>Always Correct</li>
+						<li>Highly Available</li>
+						<li>Durable for a long time (+10 years)</li>
+						<li>Immutable</li>
+						<li>Queryable (Advanced queries)</li>
+						<li>Scalable with ever growing amount of events</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Requirements</h3>
+					<ul>
+						<li>Strong Consistency</li>
+						<li>At Least Once Delivery</li>
+						<li>High Availability & Scalability</li>
+						<li>Low Latency</li>
+						<li>Persistence</li>
+						<li>Observability</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<section>
+					<p>Design</p>
+					<img data-src="img/EventStore_Design.svg" height="450">
+				</section>
+				<section>
+					Use Cases
+					<ul>
+						<li>Audit log of user actions used by customer service</li>
+						<li>Realtime fraud detection with event-driven ML-based risk scoring model</li>
+						<li>Automatic real-time FX risk hedging</li>
+						<li>Real-time PnL</li>
+						<li>Automated marketing campaigns, promotions</li>
+					</ul>
+				</section>
+			</section>
+            <section>
+                <section>
+                    <h2>Always Correct</h2>
+                </section>
+                <section>
+					<p>Event Persistence</p>
+					<img data-src="img/EventStore_Persistence.svg">
+                </section>
+				<section>
+					<p>Event Publishing</p>
+					<img data-src="img/EventStore_Publishing.svg">
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Requirements</h2>
+				</section>
+				<section>
+					<p>At Least Once Delivery</p>
+					<img data-src="img/EventStore_Streaming.svg">
+				</section>
+				<section>
+					<h3>Persistence</h3>
+					<ul>
+						<li>Postgres 11</li>
+						<li>pg_partman</li>
+						<li>NOTIFY / LISTEN</li>
+						<li>Master-Slave Replication</li>
+					</ul>
+				</section>
+				<section>
+					<h3>High Availability & Scalability</h3>
+					<ul>
+						<li>Stateless Services</li>
+						<li>Asynchronous processing</li>
+						<li>Ktor & Netty & Coroutines</li>
+						<li>Horizontal & Vertical Scaling</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Low Latency</h3>
+					<ul>
+						<li>Single GCP Region processing</li>
+						<li>HTTP Connection Pooling</li>
+						<li>Asynchronous Logging</li>
+						<li>GCP Internal TCP/UDP Load Balancing</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Immutability</h3>
+					<ul>
+						<li>Immutable Events</li>
+						<li>Immutable Events Log</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Client SDK</h2>
+				</section>
+				<section>
+					Publishing
+					<pre><code data-trim data-noescape lang="java">
+						final var config = new PublisherConfig(
+							URI.create("http://host:port")
+						);
+
+						final var persister = AlphaEventPersister
+							.withConfig(config)
+							.withAsyncPublisher();
+
+						// create event ...
+						persister.save(actionEvent);
+					</code></pre>
+				</section>
+				<section>
+					Fetching
+					<pre><code data-trim data-noescape>
+						var eventStore = EventStore
+							.withConfig(config)
+							.withDefaultHttpClient();
+
+						var filter = filterBy("Account")
+							.eventTypeEq("BalanceChangedEvent");
+
+						var query = EventQuery
+							.from(from).withTo(to)
+							.withModelTypeFilter(filter)
+							.build();
+
+						var events = eventStore.fetchEvents(query);
+						// further processing ...
+					</code></pre>
+				</section>
+				<section>
+					Streaming
+					<pre><code data-trim data-noescape>
+						class MyEventConsumer implements EventStoreConsumer {
+							@Override
+							public void onEvent(ModelEvent event) {
+								// process event
+							}
+						}
+
+						var subscription = EventStore.withConfig(config).subscribe(
+							() -> latestTimestampToReconnectFrom(),
+							filterBy("Account")
+								.eventTypeEq("BalanceChangedEvent"),
+							new MyEventConsumer());
+						subscription.start();
+					</code></pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Challenges</h2>
+				</section>
+				<section>
+					<p>Achieve p99 latency <= 20ms</p>
+					<ul>
+						<li>Binary serialization protocol (now JSON)</li>
+						<li>Dedicated write master node with no indexes</li>
+						<li>HTTP2 / RSocket / Grpc</li>
+					</ul>
+				</section>
+				<section>
+					<p>Events Schema</p>
+					<ul>
+						<li>Versioning</li>
+						<li>Discovery</li>
+						<li>Auto Generation</li>
+						<li>Technology Agnostic</li>
+					</ul>
+				</section>
+				<section>
+					<p>Database Scalability</p>
+					<ul>
+						<li>Regional Sharding</li>
+						<li>Model / Event Type Sharding</li>
+						<li>De-normalization</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<img data-src="img/logo.png" style="background:none; border:none; box-shadow:none;" height="150">
+				<p><a href="https://insights.newrelic.com/accounts/829069/dashboards/824216?kiosk=true">Demo</a></p>
+			</section>
+            <section>
+                <img data-src="img/logo.png" style="background:none; border:none; box-shadow:none;" height="150">
+				<p><a href="https://revolut.com/careers">We Are Hiring!</a></p>
+            </section>
+		</div>
+	</div>
+
+	<script src="js/reveal.js"></script>
+
+	<script>
+		Reveal.initialize({
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			transition: 'convex', // none/fade/slide/convex/concave/zoom
+			dependencies: [
+				{ src: 'plugin/markdown/marked.js' },
+				{ src: 'plugin/markdown/markdown.js' },
+				{ src: 'plugin/notes/notes.js', async: true },
+				{ src: 'plugin/highlight/highlight.js', async: true }
+			]
+		});
+	</script>
+</body>
+
+</html>
