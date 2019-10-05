@@ -45,10 +45,10 @@
 				<h2>Event Streaming</h2>
 			</section>
 			<section>
-				<img data-src="img/geecon.jpg" style="background:white; border-radius: 5px; box-shadow:none; padding: 10px 20px" height="150">
+				<img data-src="img/sphereit.png" style="background:white; border-radius: 5px; box-shadow:none" height="150">
 				<p>Join at</p>
 				<h3>slido.com</h3>
-				<p>#geecon2019 / <span style="color: #efef8f">Room 11</span></p>
+				<p>#sphereit / <span style="color: #efef8f">ReactSphere</span></p>
 			</section>
 			<section>
 				<h2>Jacek Spólnik</h2>
@@ -58,12 +58,12 @@
 						.past("EPAM", 4.years)
 						.past("Apriso", 3.years)
 
-					TechStack.now("Java", 7.years).past("C#", 4.years)
+					TechStack.now("Java", 8.years).past("C#", 4.years)
 
 					OpenSource.now("JAlgoArena").past("TradingOffice")
 						.past("NDatabase")
 
-					FavouriteStack.now("GoLang").past("Kotlin")
+					FavouriteStack.now("Java").past("Kotlin")
 						.past("JavaScript")
 				 </code></pre>
 			</section>
@@ -84,6 +84,7 @@
 						<li>Huge amount of data</li>
 						<li>Huge traffic, spikes</li>
 						<li>Need for horizontal scalability</li>
+						<li>In 1 year - 7k to 50k daily new users</li>
 					</ul>
 				</section>
 			</section>
@@ -92,12 +93,11 @@
 					<h2>Why</h2>
 				</section>
 				<section>
-					Business events audit and distribution.
+					Business events audit and distribution
 					<ul>
 						<li>Always Correct</li>
 						<li>Highly Available</li>
 						<li>Durable for a long time (+10 years)</li>
-						<li>Immutable</li>
 						<li>Queryable (Advanced queries)</li>
 						<li>Scalable with ever growing amount of events</li>
 					</ul>
@@ -165,7 +165,7 @@
 					<ul>
 						<li>Stateless Services</li>
 						<li>Asynchronous processing</li>
-						<li>Ktor & Netty & Coroutines</li>
+						<li>Ktor & Netty & RSocket</li>
 						<li>Horizontal & Vertical Scaling</li>
 					</ul>
 				</section>
@@ -227,57 +227,74 @@
 				<section>
 					Streaming
 					<pre><code data-trim data-noescape>
-						class MyEventConsumer implements EventStoreConsumer {
+						class PocketEventConsumer implements EventStoreConsumer {
 							@Override
-							public void onEvent(ModelEvent event) {
-								// process event
+							public void onEvent(ModelEvent event) { 
+								// process event 
+							}
+							
+							@Override
+							public String modelType() { 
+								return Pocket.class.getSimpleName(); 
+							}
+
+							@Override
+							public String eventType() { 
+								return Events.MODEL_CREATED_EVENT; 
+							}
+
+							@Override
+							public AttributeFilter() {
+								return and(
+									eq("/balance", "0"), 
+									eq("/currency", "EUR")
+								);
 							}
 						}
-
-						var subscription = EventStore.withConfig(config).subscribe(
-							() -> latestTimestampToReconnectFrom(),
-							filterBy("Account")
-								.eventTypeEq("BalanceChangedEvent"),
-							new MyEventConsumer());
-						subscription.start();
+						
+						var eventProcessor = new EventProcessor(
+							streamingConfig, activeHostExecutor, consumers, 
+							lastProcessedStore, "api-event-processor"
+						);
+						eventProcessor.start();
 					</code></pre>
 				</section>
 			</section>
 			<section>
 				<section>
-					<h2>Challenges</h2>
+					<h2>Learnings</h2>
 				</section>
 				<section>
-					<p>Achieve p99 latency <= 20ms</p>
+					<p>Retries</p> <ul>
+							<li>Too much retries causes artificial load</li>
+							<li>Understanding network failures vs business failures</li>
+							<li>RSocket</li>
+							</ul>
+				</section>
+				<section>
+					<p>Network Protocol</p>
 					<ul>
-						<li>Binary serialization protocol (now JSON)</li>
-						<li>Dedicated write master node with no indexes</li>
-						<li>HTTP2 / RSocket / Grpc</li>
+						<li>WebSocket unstable for long running connections</li>
+						<li>Backpressure issues</li>
+						<li>RSocket to rescue</li>
 					</ul>
 				</section>
 				<section>
-					<p>Events Schema</p>
+					<p>TypedEvents</p>
 					<ul>
-						<li>Versioning</li>
-						<li>Discovery</li>
-						<li>Auto Generation</li>
-						<li>Technology Agnostic</li>
+						<li>ModelCreatedEvent -> TransactionCreatedEvent</li>
+						<li>JVM Focused</li>
 					</ul>
 				</section>
 				<section>
-					<p>Database Scalability</p>
+					<p>Monitoring & Logging</p>
 					<ul>
-						<li>Regional Sharding</li>
-						<li>Model / Event Type Sharding</li>
-						<li>De-normalization</li>
+						<li>Understand data consistency</li>
+						<li>Understand anomalies</li>
 					</ul>
 				</section>
 			</section>
 			<section>
-				<img data-src="img/logo.png" style="background:none; border:none; box-shadow:none;" height="150">
-				<p><a href="https://insights.newrelic.com/accounts/829069/dashboards/824216?kiosk=true">Demo</a></p>
-			</section>
-            <section>
                 <img data-src="img/logo.png" style="background:none; border:none; box-shadow:none;" height="150">
 				<p><a href="https://revolut.com/careers">We Are Hiring!</a></p>
             </section>
